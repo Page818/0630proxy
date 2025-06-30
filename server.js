@@ -14,6 +14,7 @@ app.get("/proxy", async (req, res) => {
 	try {
 		const browser = await puppeteer.launch({
 			headless: "new",
+			executablePath: "/usr/bin/google-chrome",
 			args: ["--no-sandbox", "--disable-setuid-sandbox"],
 		});
 
@@ -26,7 +27,7 @@ app.get("/proxy", async (req, res) => {
 
 		await page.goto(url, { waitUntil: "domcontentloaded", timeout: 0 });
 
-		// 等 Cloudflare challenge 結束
+		// 等 Cloudflare 驗證頁跑完
 		await page.waitForTimeout(5000);
 
 		const content = await page.evaluate(() => document.body.innerText);
