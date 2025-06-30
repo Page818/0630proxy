@@ -20,6 +20,7 @@ app.get("/proxy", async (req, res) => {
 				Origin: "https://publicartap.moc.gov.tw",
 			},
 		});
+		res.json(response.data);
 	} catch (err) {
 		res.status(500).json({ error: "代理錯誤", details: err.message });
 	}
