@@ -15,7 +15,7 @@ app.get("/proxy", async (req, res) => {
 		const browser = await puppeteer.launch({
 			headless: "new",
 			args: ["--no-sandbox", "--disable-setuid-sandbox"],
-			executablePath: "/usr/bin/google-chrome", // 在 Render 上使用系統 Chrome！
+			// executablePath: "/usr/bin/google-chrome", // 在 Render 上使用系統 Chrome！
 		});
 
 		const page = await browser.newPage();

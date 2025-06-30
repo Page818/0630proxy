@@ -2,7 +2,7 @@ services:
   - type: web
     name: zero630proxy
     env: node
-    buildCommand: "npm install"
+    buildCommand: 'npm install && npx puppeteer install'
     startCommand: "node server.js"
     envVars:
       - key: NODE_ENV
