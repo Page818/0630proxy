@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const puppeteer = require("puppeteer-core");
+const puppeteer = require("puppeteer");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -15,8 +15,6 @@ app.get("/proxy", async (req, res) => {
 		const browser = await puppeteer.launch({
 			headless: "new",
 			args: ["--no-sandbox", "--disable-setuid-sandbox"],
-			executablePath: "/usr/bin/chromium-browser",
-			// executablePath: "/usr/bin/google-chrome", // 在 Render 上使用系統 Chrome！
 		});
 
 		const page = await browser.newPage();
@@ -28,7 +26,7 @@ app.get("/proxy", async (req, res) => {
 
 		await page.goto(url, { waitUntil: "domcontentloaded", timeout: 0 });
 
-		// 等待 Cloudflare 檢查完成（簡單 5 秒延遲）
+		// 等 Cloudflare challenge 結束
 		await page.waitForTimeout(5000);
 
 		const content = await page.evaluate(() => document.body.innerText);
