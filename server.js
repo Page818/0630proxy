@@ -15,11 +15,11 @@ app.get("/proxy", async (req, res) => {
 		const browser = await puppeteer.launch({
 			headless: "new",
 			args: ["--no-sandbox", "--disable-setuid-sandbox"],
+			executablePath: "/usr/bin/google-chrome", // 在 Render 上使用系統 Chrome！
 		});
 
 		const page = await browser.newPage();
 
-		// 偽裝成真正使用者（超重要）
 		await page.setUserAgent(
 			"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
 				"(KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
@@ -27,7 +27,7 @@ app.get("/proxy", async (req, res) => {
 
 		await page.goto(url, { waitUntil: "domcontentloaded", timeout: 0 });
 
-		// 等待 Cloudflare challenge（5 秒通常夠）
+		// 等待 Cloudflare 檢查完成（簡單 5 秒延遲）
 		await page.waitForTimeout(5000);
 
 		const content = await page.evaluate(() => document.body.innerText);
@@ -42,5 +42,5 @@ app.get("/proxy", async (req, res) => {
 });
 
 app.listen(PORT, () => {
-	console.log(`✅ Puppeteer Proxy server running at http://localhost:${PORT}`);
+	console.log(`✅ Proxy server running at http://localhost:${PORT}`);
 });
