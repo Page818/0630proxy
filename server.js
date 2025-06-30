@@ -18,12 +18,17 @@ app.get("/proxy", async (req, res) => {
 		});
 
 		const page = await browser.newPage();
+
+		// 偽裝成真正使用者（超重要）
 		await page.setUserAgent(
 			"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
 				"(KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
 		);
 
-		await page.goto(url, { waitUntil: "networkidle2", timeout: 0 });
+		await page.goto(url, { waitUntil: "domcontentloaded", timeout: 0 });
+
+		// 等待 Cloudflare challenge（5 秒通常夠）
+		await page.waitForTimeout(5000);
 
 		const content = await page.evaluate(() => document.body.innerText);
 		const data = JSON.parse(content);
@@ -37,5 +42,5 @@ app.get("/proxy", async (req, res) => {
 });
 
 app.listen(PORT, () => {
-	console.log(`✅ puppeteer Proxy server running at http://localhost:${PORT}`);
+	console.log(`✅ Puppeteer Proxy server running at http://localhost:${PORT}`);
 });
