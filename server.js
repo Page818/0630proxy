@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const axios = require("axios");
+const puppeteer = require("puppeteer");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -10,26 +10,32 @@ app.use(cors());
 app.get("/proxy", async (req, res) => {
 	const { url } = req.query;
 	if (!url) return res.status(400).json({ error: "缺少 URL 參數" });
+
 	try {
-		const response = await axios.get(url, {
-			headers: {
-				"User-Agent":
-					"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
-				Accept: "application/json, text/plain, */*",
-				"Accept-Language": "zh-TW,zh;q=0.9,en;q=0.8",
-				Referer: "https://publicartap.moc.gov.tw/",
-				Origin: "https://publicartap.moc.gov.tw",
-				Host: "publicartap.moc.gov.tw",
-			},
+		const browser = await puppeteer.launch({
+			headless: "new",
+			args: ["--no-sandbox", "--disable-setuid-sandbox"],
 		});
-		res.json(response.data);
+
+		const page = await browser.newPage();
+		await page.setUserAgent(
+			"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+				"(KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
+		);
+
+		await page.goto(url, { waitUntil: "networkidle2", timeout: 0 });
+
+		const content = await page.evaluate(() => document.body.innerText);
+		const data = JSON.parse(content);
+
+		await browser.close();
+		res.json(data);
 	} catch (err) {
-		const status = err.response?.status || 500;
-		const message = err.response?.data || err.message;
-		res.status(status).json({ error: "代理錯誤", details: message });
+		console.error("❌ puppeteer 錯誤：", err.message);
+		res.status(500).json({ error: "代理錯誤", details: err.message });
 	}
 });
 
 app.listen(PORT, () => {
-	console.log(`✅ Proxy server running at http://localhost:${PORT}`);
+	console.log(`✅ puppeteer Proxy server running at http://localhost:${PORT}`);
 });
