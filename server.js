@@ -24,7 +24,9 @@ app.get("/proxy", async (req, res) => {
 		});
 		res.json(response.data);
 	} catch (err) {
-		res.status(500).json({ error: "代理錯誤", details: err.message });
+		const status = err.response?.status || 500;
+		const message = err.response?.data || err.message;
+		res.status(status).json({ error: "代理錯誤", details: message });
 	}
 });
 
