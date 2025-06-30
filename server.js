@@ -13,11 +13,13 @@ app.get("/proxy", async (req, res) => {
 	try {
 		const response = await axios.get(url, {
 			headers: {
-				"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+				"User-Agent":
+					"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
 				Accept: "application/json, text/plain, */*",
 				"Accept-Language": "zh-TW,zh;q=0.9,en;q=0.8",
 				Referer: "https://publicartap.moc.gov.tw/",
 				Origin: "https://publicartap.moc.gov.tw",
+				Host: "publicartap.moc.gov.tw",
 			},
 		});
 		res.json(response.data);
